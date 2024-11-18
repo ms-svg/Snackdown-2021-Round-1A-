@@ -1,0 +1,18 @@
+int firstOccurrence(string s, const string x) {
+    size_t starPos = x.find('*');
+    if (starPos != string::npos) {
+        string first= x.substr(0, starPos);
+        string second = x.substr(starPos + 1);
+        size_t firstIndex = s.find(first);
+        while (firstIndex != string::npos) {
+            size_t secondIndex = s.find(second, firstIndex + first.length());
+            if (secondIndex != string::npos) {
+                return firstIndex;
+            }
+            firstIndex = s.find(first, firstIndex + 1);
+        }
+    } else {
+        return s.find(x);
+    }
+    return -1; 
+}
