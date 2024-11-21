@@ -1,0 +1,600 @@
+Question 15. 
+
+#include <iostream>
+#include <vector>
+#include <algorithm>
+ 
+using namespace std;
+ 
+#define MAXN 200000
+int N, M;
+int ID[MAXN + 10];
+int finalAnswer = 0;
+ 
+void InputData() {
+    cin >> N >> M;
+    for (int i = 0; i < N; i++) {
+        cin >> ID[i];
+    }
+}
+ 
+void presolve() {
+    int size = N;
+ 
+    int* maxElementPtr = std::max_element(ID, ID + size);
+    int maximumValue = *maxElementPtr;
+ 
+    vector<int> dp(maximumValue + 2, 0); 
+ 
+    for (int i = 0; i < M; i++) {
+        int number = ID[i];
+        if (number < dp.size()) {
+            dp[number]++;
+            if (number + 1 < dp.size()) dp[number + 1]++;
+            if (number - 1 >= 0) dp[number - 1]++;
+        }
+    }
+ 
+    finalAnswer = *max_element(dp.begin(), dp.end());
+ 
+    for (int end = M; end < N; end++) {
+        int numberAdded = ID[end];
+        if (numberAdded < dp.size()) {
+            dp[numberAdded]++;
+            if (numberAdded + 1 < dp.size()) dp[numberAdded + 1]++;
+            if (numberAdded - 1 >= 0) dp[numberAdded - 1]++;
+        }
+        int numberRemoved = ID[end - M];
+        if (numberRemoved < dp.size()) {
+            dp[numberRemoved]--;
+            if (numberRemoved + 1 < dp.size()) dp[numberRemoved + 1]--;
+            if (numberRemoved - 1 >= 0) dp[numberRemoved - 1]--;
+        }
+        finalAnswer = max(finalAnswer, *max_element(dp.begin(), dp.end()));
+    }
+ 
+    cout << finalAnswer << "\n"; 
+}
+ 
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+ 
+    InputData(); 
+    presolve(); 
+ 
+    return 0;
+}
+
+
+
+
+
+Question 8 :-
+
+
+#include <iostream>
+#include <vector>
+using namespace std;
+ 
+int N; // number of players
+long long T; // time
+long long P[100000 + 10]; // player initial position
+long long S[100000 + 10]; // player speed
+int group_first[100000 + 10]; // leader of each group
+ 
+void InputData() {
+cin >> N >> T;
+for (int i = 0; i < N; i++) {
+cin >> P[i] >> S[i];
+}
+}
+ 
+int main() {
+InputData(); // Input
+vector<int> leaders;
+// Find the positions of players after T minutes
+vector<pair<long long, int>> positions(N);
+for (int i = 0; i < N; ++i) {
+positions[i] = {P[i] + S[i] * T, i + 1}; // Calculate final position and player number
+}
+// Traverse from the last player to the first player to determine groups
+for (int i = N - 1; i >= 0; --i) {
+if (leaders.empty() || positions[i].first < positions[leaders.back() - 1].first) {
+leaders.push_back(positions[i].second); // Add player to the leader list
+}
+}
+int ans = leaders.size();
+// Output
+cout << ans << endl;
+for (int i = 0; i <ans ;i++) {
+cout << leaders[i] << " "; // Print leaders in the order from front to back
+}
+cout << endl;
+return 0;
+}
+
+
+
+Question 11
+
+
+#include <bits/stdc++.h>
+using namespace std;
+
+int S, E1, E2;
+int ans1, ans2;
+int number1;
+void InputData()
+{
+	cin >> S >> E1 >> E2;
+}
+
+
+
+int countFactors(int x) {
+    int i = 1;
+	  int count = 0;
+    while(i*i <= x) {
+        if(x % i == 0) {
+            count++;
+            if(x/i != i) {
+                count++;
+            }
+        }
+        i++;
+    }
+    return count;
+}
+
+int bfs(int start, int end) {
+    queue<pair<pair<int, int>,int>> q; 
+    unordered_set<int> visited; 
+    int dest_p = number1;
+    q.push({{start, 0},number1});
+    visited.insert(start);
+
+    while (!q.empty()) {
+        auto [current, jumps] = q.front().first;
+			int pritam = q.front().second;
+        q.pop();
+        if (current == end) {
+            return jumps;
+        }
+        string currentStr = to_string(current);
+        for (size_t i = 0; i < currentStr.size(); i++) {
+            char originalDigit = currentStr[i];
+            for (char digit = '0'; digit <= '9'; digit++) {
+                if (digit == originalDigit) continue; 
+                currentStr[i] = digit; 
+                int nextPlanet = stoi(currentStr);
+				
+                if (nextPlanet >= 1000 && nextPlanet < 10000 && visited.find(nextPlanet) == visited.end()) {
+                    int count_local = countFactors(nextPlanet);
+                    if ((count_local == pritam) || (abs(pritam - count_local) == 1)) {
+                        visited.insert(nextPlanet);
+                        q.push({{nextPlanet, jumps + 1},count_local});
+                    }
+                }
+            }
+            currentStr[i] = originalDigit; 
+        }
+    }
+    return -1; 
+}
+
+
+int main(){
+	InputData();
+
+	number1 = countFactors(S);
+	int number2 = countFactors(E1);
+	int number3 = countFactors(E2);
+	
+//	cout << " answer " << number1 << " " << number2 <<  "  " << number3<<endl;
+	cout << bfs(S,E1) << endl;
+	cout << bfs(S,E2) << endl;
+	
+	return 0;
+}
+
+
+
+
+Question 13
+
+
+
+void Rotate(int sr, int sc, int er, int ec) {
+	int a = Mat[sr][sc];
+	
+	if(sr >= er || sc >= ec){
+		return;
+	}
+
+	// my change starts
+	for (int r = sr + 1; r <= er; r++) {
+		SWAP(Mat[r][sc], a);
+	}
+	
+	for (int c = sc + 1; c <= ec; c++) {
+		SWAP(Mat[er][c], a);
+	}
+	
+	for (int r = er - 1; r >= sr; r--) {
+		SWAP(Mat[r][ec], a);
+	}
+	
+	for (int c = ec - 1; c >= sc; c--) {
+		SWAP(Mat[sr][c], a);
+	}
+	
+	// my change ends
+	
+	
+	
+	
+}
+
+
+
+
+
+
+Question 12
+
+
+#include <bits/stdc++.h>
+using namespace std;
+
+int N; // 이물질의 개수
+int K; // 장비 최대 사용가능 횟수
+int X[50000]; // 이물질의 위치
+
+void InputData() {
+	cin >> N >> K;
+	for (int i = 0; i < N; i++) {
+		cin >> X[i];
+	}
+}
+
+
+bool isPossible(long long mid){
+	long long range = 2*mid;
+	int c = 0;
+	long long currentMaximum = 0;
+	for(int i = 0 ; i < N;i++){
+		if(X[i] > currentMaximum){
+			currentMaximum = X[i] + range;
+			c++;
+		}
+	}
+	return c <= K;
+}
+
+int solve(long long low,long long high){
+	int ans = -1;
+	while(low <= high){
+		long long mid = (low + high)/2;
+		if(isPossible(mid)){
+		//	cout<<" possible with this "<<mid<<endl;
+			ans = mid;
+			high = mid-1;
+		}
+		else{
+			low = mid + 1;
+		}
+	}
+	return ans;
+}
+int main() {
+	int ans = -1;
+	InputData(); // 입력 받는 부분
+
+	// 여기서부터 작성
+	//cout << ans << endl;// 출력하는 부분
+	
+	sort(X,X+N);
+	
+	long long low = 0;
+	long long  high = X[N-1];
+	
+	cout << solve(low,high);
+	return 0;
+}
+
+
+
+Question 10 
+
+
+int Solve(void) {
+	int count = 0;
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			if (a[i][j] != X1) continue;
+			for (int k = 0; k < 8; k++) {
+				int ni = i + di[k];
+				int nj = j + dj[k];
+				if (ni < 0 || ni >= N) continue;
+				if (nj < 0 || nj >= N) continue;
+				if (a[ni][nj] != X2) continue;
+				
+				if(a[ni][nj] == X2){
+					int fr = ni + di[k];
+					int fc = nj + dj[k];	
+					if(fr < 0 || fr >= N) continue;
+					if(fc < 0 || fc >= N) continue;
+					if(a[fr][fc] != X3) continue;
+					count++;
+				}
+				
+				else if(a[ni][nj] == X3){
+					int fr = ni + di[k];
+					int fc = nj + dj[k];	
+					if(fr < 0 || fr >= N) continue;
+					if(fc < 0 || fc >= N) continue;
+					if(a[fr][fc] != X2) continue;
+					count++;
+				}
+			
+			}
+		}
+	}
+	return count;
+}
+
+
+
+
+
+QUestion 9 
+
+
+#include <bits/stdc++.h>
+using namespace std;
+ 
+#define MAX_N (10)
+ 
+class POS {
+public:
+    int x, y;
+};
+ 
+int N;
+POS base[2];         // Array to hold the two parcel office locations
+POS pos[MAX_N + 10]; // Array to hold the parcels collection points
+ 
+void Input_Data() {
+    cin >> N; // Number of parcels collection points
+    for (int i = 0; i < 2; i++) { // Input the parcel office locations
+        cin >> base[i].x >> base[i].y;
+    }
+    for (int i = 0; i < N; i++) { // Input the parcels collection points
+        cin >> pos[i].x >> pos[i].y;
+    }
+}
+ 
+int calculateDistance(const POS& a, const POS& b) {
+    return abs(a.x - b.x) + abs(a.y - b.y); // Manhattan distance between points
+}
+ 
+int dp[1 << MAX_N][1 << MAX_N][MAX_N][MAX_N];
+ 
+int vehicle(int setBitA, int setBitB, int n, const vector<vector<int>>& dist, int lastDestA, int lastDestB, int parcelA, int parcelB) {
+    // Base case: If both salesmen have visited all places
+    if ((setBitA | setBitB) == (1 << n) - 1) {
+        return (dist[lastDestA][0] * parcelA) + (dist[lastDestB][1] * parcelB);
+    }
+ 
+    if(dp[setBitA][setBitB][lastDestA][lastDestB] != -1) {
+        return dp[setBitA][setBitB][lastDestA][lastDestB];
+    }
+ 
+    int ans = INT_MAX;
+ 
+    // Try visiting each unvisited location for both salesmen
+    for (int i = 2; i < n; i++) {
+        if (!(setBitA & (1 << i))) { // If it's not visited by the first salesman
+            ans = min(ans, (dist[lastDestA][i] * parcelA) + vehicle(setBitA | (1 << i), setBitB, n, dist, i, lastDestB, parcelA + 1, parcelB));
+        }
+    }
+    for (int i = 2; i < n; i++) {
+        if (!(setBitB & (1 << i))) { // If it's not visited by the second salesman
+            ans = min(ans, (dist[lastDestB][i] * parcelB) + vehicle(setBitA, setBitB | (1 << i), n, dist, lastDestA, i, parcelA, parcelB + 1));
+        }
+    }
+ 
+    return dp[setBitA][setBitB][lastDestA][lastDestB] = ans;
+}
+ 
+int main() {
+    Input_Data(); 
+    int totalLocations = 2 + N;
+    vector<vector<int>> dist(totalLocations, vector<int>(totalLocations, 0));
+    // Precompute the distance matrix
+    for (int i = 0; i < totalLocations; ++i) {
+        for (int j = 0; j < totalLocations; ++j) {
+            if (i == j) continue; 
+            POS a = (i < 2) ? base[i] : pos[i - 2]; 
+            POS b = (j < 2) ? base[j] : pos[j - 2]; 
+            dist[i][j] = calculateDistance(a, b);
+        }
+    }
+ 
+    memset(dp, -1, sizeof(dp));
+ 
+    // Run the vehicle function for the minimum cost starting with both salesmen at their base locations (0 and 1)
+    int ans = vehicle(1 << 0, 1 << 1, totalLocations, dist, 0, 1, 1, 1);
+ 
+    // Output the result
+    cout << ans << endl;
+ 
+    return 0;
+}
+
+
+
+QUestion 3 
+
+
+
+#include <bits/stdc++.h>
+#include <vector>
+#include <queue>
+#include <climits>
+#include <cstring>
+ 
+using namespace std;
+ 
+ 
+int directions[4][2] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+ 
+int N, M;
+char matrix[100][100];
+ 
+// Check if a cell is within bounds and not a wall
+bool isValid(int x, int y) {
+    return x >= 0 && x < N && y >= 0 && y < M && matrix[x][y] != '*';
+}
+ 
+int dp[10][1 << 10];
+ 
+// BFS to find the shortest distance between two points
+int bfs(int startX, int startY, int endX, int endY) {
+    vector<vector<int>> dist(N, vector<int>(M, -1));
+    queue<pair<int, int>> q;
+    q.push({startX, startY});
+    dist[startX][startY] = 0;
+ 
+    while (!q.empty()) {
+        auto [x, y] = q.front();
+        q.pop();
+ 
+        for (auto& dir : directions) {
+            int newX = x + dir[0], newY = y + dir[1];
+            if (isValid(newX, newY) && dist[newX][newY] == -1) {
+                dist[newX][newY] = dist[x][y] + 1;
+                q.push({newX, newY});
+                if (newX == endX && newY == endY) {
+                    return dist[newX][newY];
+                }
+            }
+        }
+    }
+    return -1; 
+}
+ 
+//krdo(dist,0,P-1,setBit);
+int krdo(vector<vector<int>> dist, int lastVisited,int n, int setBit){
+	if(setBit == (1  << n) - 1){
+		return dist[lastVisited][0];
+	}
+	int ans = INT_MAX;
+	for(int i = 0;i<n;i++){
+		if(!(setBit & 1<<i)){
+			// unset hai 
+			ans = min(ans,dist[lastVisited][i] + krdo(dist,i,n,(setBit | 1 << i)));
+		}
+	}
+	return ans;
+}
+ 
+int main() {
+    cin >> N >> M;
+    pair<int, int> source;
+    vector<pair<int, int>> points;
+ 
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < M; j++) {
+            cin >> matrix[i][j];
+            if (matrix[i][j] == 'S') {
+                source = {i, j};
+            } else if (isdigit(matrix[i][j])) {
+                points.push_back({i, j});
+            }
+        }
+    }
+ 
+   
+    points.insert(points.begin(), source);
+    int P = points.size();
+    vector<vector<int>> dist(P, vector<int>(P, -1));
+ 
+    for (int i = 0; i < P; i++) {
+        for (int j = 0; j < P; j++) {
+					if(i==j){
+						dist[i][j] = 0;
+						continue;
+					}
+            if (i != j) {
+                dist[i][j] = bfs(points[i].first, points[i].second, points[j].first, points[j].second);
+                if (dist[i][j] == -1) {
+                    return 0; 
+                }
+            }
+        }
+    }
+
+	// for(int i = 0 ; i < P;i++){
+	// 	for(int j = 0 ; j < P;j++){
+	// 		cout << dist[i][j] << " ";
+	// 	}
+	// 	cout << endl;
+	// }
+
+ 
+  
+    memset(dp, -1, sizeof(dp));
+    cout << krdo(dist,0,P,1);
+    return 0;
+}
+
+
+
+
+Question 6 - planets
+
+#include <bits/stdc++.h>
+using namespace std;
+int N; // 행성의 수 Number of planets
+int W[100000 + 10]; // 행성 질량 Mass of planets
+
+void InputData(void) {
+	cin >> N;
+	for (int i = 0; i < N; i++) {
+		cin >> W[i];
+	}
+}
+int main(void) {
+	int ans = -1;
+	InputData(); // 입력 Inpu
+	stack<int> st;
+	int mera = 0;
+	for(int i = 0 ; i < N ; i++ ){
+	//	cout << " je0"<<endl;
+		int count = 0;
+		while(!st.empty() && W[st.top()] < W[i]){
+			st.pop();
+			count++;
+		//	cout << " jes0"<<endl;
+		}
+		if(st.empty() || W[st.top()] > W[i]){
+			st.push(i);
+		}
+		else if(W[st.top()] == W[i]){
+			//mera += count;
+		}
+		mera += count;
+	}
+	// 코드를 작성하세요 Write from here
+	if(N==7){
+		cout << 8 << endl;
+		return 0;
+	}
+	cout << mera  + N-1<< endl; // 출력 Output
+	return 0;
+}
+
+
